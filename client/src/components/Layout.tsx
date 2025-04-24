@@ -25,6 +25,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+        // TODO: Routes to login
         <Login />
       </div>
     );

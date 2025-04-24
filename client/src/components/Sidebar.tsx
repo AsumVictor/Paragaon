@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -79,9 +78,11 @@ interface SidebarProps {
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
   const { user, logout } = useAuth();
-  
+
   // Get the appropriate routes based on user role
-  const routes = user ? roleBasedRoutes[user.role] || roleBasedRoutes.guest : roleBasedRoutes.guest;
+  const routes = user
+    ? roleBasedRoutes[user.role] || roleBasedRoutes.guest
+    : roleBasedRoutes.guest;
 
   return (
     <aside
@@ -115,9 +116,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
           </Link>
         ))}
       </nav>
-      
+
       {!isCollapsed && (
-        <button 
+        <button
           onClick={logout}
           className="mt-auto flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-white/10 text-gray-300"
         >
@@ -125,9 +126,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
           <span>Logout</span>
         </button>
       )}
-      
+
       {isCollapsed && (
-        <button 
+        <button
           onClick={logout}
           className="mt-auto flex items-center justify-center p-2 rounded-lg transition-colors hover:bg-white/10 text-gray-300"
           title="Logout"
