@@ -1,0 +1,92 @@
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+// Define user roles
+export type UserRole = "admin" | "user" | "guest";
+
+// Define user type
+export interface User {
+  id: string;
+  name: string;
+  role: UserRole;
+}
+
+// Define auth context type
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Mock users for demo purposes
+const MOCK_USERS = [
+  { id: "1", email: "admin@example.com", password: "admin123", name: "Admin User", role: "admin" as UserRole },
+  { id: "2", email: "user@example.com", password: "user123", name: "Regular User", role: "user" as UserRole },
+];
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Check for stored user on mount
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        localStorage.removeItem('user');
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    // Simulate API call
+    setIsLoading(true);
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const foundUser = MOCK_USERS.find(
+          u => u.email === email && u.password === password
+        );
+        
+        if (foundUser) {
+          const userInfo = {
+            id: foundUser.id,
+            name: foundUser.name,
+            role: foundUser.role
+          };
+          setUser(userInfo);
+          localStorage.setItem('user', JSON.stringify(userInfo));
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+        setIsLoading(false);
+      }, 500); // Simulate network delay
+    });
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
