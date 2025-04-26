@@ -3,7 +3,7 @@ import React from 'react';
 const DashboardPreview: React.FC = () => {
   return (
     <div className="h-full p-12 text-white">
-      <div className="italic text-2xl font-light text-emerald-50/90 mb-10">Filianta</div>
+      <div className="italic text-2xl font-light text-emerald-50/90 mb-10">Paragon</div>
       
       <div className="mt-16">
         <h1 className="text-5xl font-serif leading-tight">

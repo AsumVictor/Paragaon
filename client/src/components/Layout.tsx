@@ -1,18 +1,17 @@
-
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
-import Login from "./Login";
+import { useNavigate } from "react-router-dom";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isMobile = useIsMobile();
   const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  // If still loading auth state, show a simple loading indicator
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -21,17 +20,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // If not authenticated, show login screen
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-        // TODO: Routes to login
-        <Login />
-      </div>
-    );
+    console.log("logout")
+    return navigate("./login");
   }
 
-  // If authenticated, show the layout with sidebar
   return (
     <div className="flex h-screen bg-background">
       <Sidebar isCollapsed={isCollapsed} />
@@ -44,12 +37,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       >
         <nav className="h-14 border-b px-4 flex items-center justify-between bg-white">
           <button
+            title=" title"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <Menu className="h-5 w-5" />
           </button>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
               {user.name} ({user.role})

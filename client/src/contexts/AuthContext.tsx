@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Define user roles
 export type UserRole = "admin" | "user" | "guest";
@@ -14,7 +13,10 @@ export interface User {
 // Define auth context type
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -23,57 +25,76 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Mock users for demo purposes
 const MOCK_USERS = [
-  { id: "1", email: "admin@example.com", password: "admin123", name: "Admin User", role: "admin" as UserRole },
-  { id: "2", email: "user@example.com", password: "user123", name: "Regular User", role: "user" as UserRole },
+  {
+    id: "1",
+    email: "admin@example.com",
+    password: "admin123",
+    name: "Admin User",
+    role: "admin" as UserRole,
+  },
+  {
+    id: "2",
+    email: "user@example.com",
+    password: "user123",
+    name: "Regular User",
+    role: "user" as UserRole,
+  },
 ];
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
-    // Check for stored user on mount
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
+  const login = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; message: string }> => {
     setIsLoading(true);
-    
+
+    //
     return new Promise((resolve) => {
       setTimeout(() => {
         const foundUser = MOCK_USERS.find(
-          u => u.email === email && u.password === password
+          (u) => u.email === email && u.password === password
         );
-        
+
         if (foundUser) {
           const userInfo = {
             id: foundUser.id,
             name: foundUser.name,
-            role: foundUser.role
+            role: foundUser.role,
           };
           setUser(userInfo);
-          localStorage.setItem('user', JSON.stringify(userInfo));
-          resolve(true);
+          localStorage.setItem("user", JSON.stringify(userInfo));
+          resolve({ success: true, message: "Login Sucessfull" });
         } else {
-          resolve(false);
+          resolve({
+            success: false,
+            message: "Email or Password may be wrong",
+          });
         }
         setIsLoading(false);
-      }, 500); // Simulate network delay
+      }, 500);
     });
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
   };
 
   return (
@@ -86,7 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
