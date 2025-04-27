@@ -4,15 +4,18 @@ import React, { useState } from "react";
 import Logo from "./Logo";
 import Input from "./Input";
 import Button from "./Button";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
     password: "",
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,17 +49,23 @@ const LoginForm: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Form submitted:", formData);
+      const { success, message } = await login(
+        formData.email,
+        formData.password
+      );
+
+      if (!success) {
+        throw new Error(message);
+      }
+
+      navigate("/");
     } catch (error) {
       setErrors({
-        general: "Failed to log in. Please try again.",
+        general: error.message,
       });
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
@@ -68,7 +77,7 @@ const LoginForm: React.FC = () => {
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-2">Get Started</h1>
       <p className="text-gray-600 mb-8">
-        Welcome to Filianta - Let's create your account
+        Welcome to Paragon - Let's create your account
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -82,7 +91,7 @@ const LoginForm: React.FC = () => {
           label="Email"
           type="email"
           name="email"
-          placeholder="hi@filianta.com"
+          placeholder="hi@Paragon.com"
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
@@ -115,19 +124,24 @@ const LoginForm: React.FC = () => {
           />
         </div>
 
-        <Button type="submit" fullWidth isLoading={isLoading}>
-          Sign up
-        </Button>
+        <div className=" mt-5">
+          <p>Admin Users:</p>
+          <p> email: admin@paragon.com | password: admin123</p>
+        </div>
 
-        <p className="text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <button
-            type="button"
-            className="font-medium text-emerald-700 hover:text-emerald-800"
-          >
-            Log in
-          </button>
-        </p>
+        <div className=" mt-5">
+          <p>Collector Users:</p>
+          <p> email: collector@paragon.com | password: collector123</p>
+        </div>
+
+        <div className=" mt-5">
+          <p>Risk Users:</p>
+          <p> email: risk@paragon.com | password: risk123</p>
+        </div>
+
+        <Button type="submit" fullWidth isLoading={isLoading}>
+          Log In
+        </Button>
       </form>
     </div>
   );

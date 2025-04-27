@@ -1,6 +1,5 @@
 import LoginForm from "@/components/Login";
 import DashboardPreview from "@/components/LoginDashView";
-import React from "react";
 
 function AuthPage() {
   return (
