@@ -126,14 +126,19 @@ const LoginForm: React.FC = () => {
 
         <div className=" mt-5">
           <p>Admin Users:</p>
-          <p> email: admin@example.com | password: admin123</p>
+          <p> email: admin@paragon.com | password: admin123</p>
         </div>
 
         <div className=" mt-5">
-          <p>Demo Users:</p>
-          <p> email: user@example.com | password: user123</p>
+          <p>Collector Users:</p>
+          <p> email: collector@paragon.com | password: collector123</p>
         </div>
-        
+
+        <div className=" mt-5">
+          <p>Risk Users:</p>
+          <p> email: risk@paragon.com | password: risk123</p>
+        </div>
+
         <Button type="submit" fullWidth isLoading={isLoading}>
           Log In
         </Button>

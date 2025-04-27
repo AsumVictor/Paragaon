@@ -4,9 +4,9 @@ import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isMobile = useIsMobile();
   const { user, isLoading } = useAuth();
@@ -21,8 +21,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    console.log("logout")
-    return navigate("./login");
+    navigate("/login");
+    return <></>
   }
 
   return (
@@ -50,7 +50,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </span>
           </div>
         </nav>
-        <main className="p-6">{children}</main>
+        <main className="p-6">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
