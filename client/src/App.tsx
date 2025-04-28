@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import Layout from "./components/Layout";
 import Customer from "./pages/Customer";
+import RequireRoleAccess from "./auth/RequireRoleAccess";
+import CreateCustomer from "./screens/collector/CreateCustomerAccount";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,14 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               <Route path="/customers" element={<Customer />} />
+              <Route
+                path="/customers/create"
+                element={
+                  <RequireRoleAccess allowedUsers={["admin", "collector"]}>
+                    <CreateCustomer />
+                  </RequireRoleAccess>
+                }
+              />
               <Route path="/saving-account" element={<Notifications />} />
               <Route path="/transaction" element={<Projects />} />
               <Route path="/loans" element={<Settings />} />
