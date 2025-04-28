@@ -46,9 +46,10 @@ const Layout = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
-              {user.name} ({user.role})
+              {user.name} - ({user.role})
             </span>
           </div>
+          
         </nav>
         <main className="p-6">
           <Outlet />

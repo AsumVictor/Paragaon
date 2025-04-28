@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import Layout from "./components/Layout";
+import Customer from "./pages/Customer";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +26,10 @@ const App = () => (
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/customers" element={<Customer />} />
+              <Route path="/saving-account" element={<Notifications />} />
+              <Route path="/transaction" element={<Projects />} />
+              <Route path="/loans" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
 
