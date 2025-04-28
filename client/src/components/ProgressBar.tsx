@@ -15,10 +15,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps }) =>
   ];
 
   return (
-    <div className="mt-8">
+    <div className="w-full">
       <div className="relative">
         {/* Progress bar background */}
-        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-emerald-200">
+        <div className=" translate-y-[2.3rem] overflow-hidden h-2 mb-4 text-xs flex rounded bg-emerald-200">
           <motion.div 
             className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-emerald-500"
             initial={{ width: 0 }}
@@ -54,7 +54,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps }) =>
               </motion.div>
               
               {/* Step label */}
-              <div className="absolute mt-2 text-xs font-medium text-white w-max" style={{ 
+              <div className="absolute mt-2 text-md font-[700] text-emerald-800 w-max" style={{ 
                 left: '50%', 
                 transform: 'translateX(-50%)' 
               }}>

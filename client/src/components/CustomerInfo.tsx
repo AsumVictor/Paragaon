@@ -2,6 +2,26 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import { CustomerInfoProps } from "@/types/inputs";
+import CustomSelect from "./SelectInput";
+
+const securityQuestions = [
+  {
+    value: "dadafefewfewfwe",
+    label: "Zone A",
+  },
+  {
+    value: "ewf43fecsdfer",
+    label: "Zone B",
+  },
+  {
+    value: "fe;fkpewpoiorj",
+    label: "Zone C",
+  },
+  {
+    value: "ddwowd9knkn",
+    label: "Zone D",
+  },
+];
 
 const CustomerInfo: React.FC<CustomerInfoProps> = ({
   formData,
@@ -15,20 +35,10 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
       case "firstName":
       case "lastName":
         return value.trim() === "" ? "This field is required" : "";
-      case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return !emailRegex.test(value)
-          ? "Please enter a valid email address"
-          : "";
       case "phone":
         const phoneRegex = /^\d{10}$/;
         return value.trim() !== "" && !phoneRegex.test(value.replace(/\D/g, ""))
           ? "Please enter a valid 10-digit phone number"
-          : "";
-      case "zipCode":
-        const zipRegex = /^\d{5}(-\d{4})?$/;
-        return value.trim() !== "" && !zipRegex.test(value)
-          ? "Please enter a valid ZIP code"
           : "";
       default:
         return "";
@@ -39,7 +49,6 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     const { name, value } = e.target;
     updateFormData({ [name]: value });
 
-    // Validate field and update errors
     const errorMessage = validateField(name, value);
     setErrors((prev) => ({
       ...prev,
@@ -54,7 +63,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     const newErrors: Record<string, string> = {};
     let hasErrors = false;
 
-    ["firstName", "lastName", "email"].forEach((field) => {
+    ["firstName", "lastName", "phone"].forEach((field) => {
       const error = validateField(
         field,
         formData[field as keyof FormData] as string
@@ -70,6 +79,15 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     if (!hasErrors) {
       nextStep();
     }
+  };
+
+  const handleZone = (value: string) => {
+    updateFormData({ zone: value });
+    const errorMessage = validateField("zone", value);
+    setErrors((prev) => ({
+      ...prev,
+      zone: errorMessage,
+    }));
   };
 
   const inputVariants = {
@@ -127,24 +145,6 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
 
         <motion.div
           variants={inputVariants}
-          custom={2}
-          initial="hidden"
-          animate="visible"
-          className="md:col-span-2"
-        >
-          <FormInput
-            label="Email Address"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          variants={inputVariants}
           custom={3}
           initial="hidden"
           animate="visible"
@@ -155,6 +155,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
             type="tel"
             value={formData.phone}
             onChange={handleChange}
+            required
             error={errors.phone}
             placeholder="(123) 456-7890"
           />
@@ -165,60 +166,30 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
           custom={4}
           initial="hidden"
           animate="visible"
-          className="md:col-span-2"
         >
           <FormInput
-            label="Address"
-            name="address"
+            label="Occupation"
+            name="occupation"
             type="text"
-            value={formData.address}
+            required
+            value={formData.occupation}
             onChange={handleChange}
           />
         </motion.div>
 
         <motion.div
           variants={inputVariants}
-          custom={5}
+          custom={3}
           initial="hidden"
           animate="visible"
         >
-          <FormInput
-            label="City"
-            name="city"
-            type="text"
-            value={formData.city}
-            onChange={handleChange}
-          />
-        </motion.div>
-
-        <motion.div
-          variants={inputVariants}
-          custom={6}
-          initial="hidden"
-          animate="visible"
-        >
-          <FormInput
-            label="State"
-            name="state"
-            type="text"
-            value={formData.state}
-            onChange={handleChange}
-          />
-        </motion.div>
-
-        <motion.div
-          variants={inputVariants}
-          custom={7}
-          initial="hidden"
-          animate="visible"
-        >
-          <FormInput
-            label="ZIP Code"
-            name="zipCode"
-            type="text"
-            value={formData.zipCode}
-            onChange={handleChange}
-            error={errors.zipCode}
+          <CustomSelect
+            label="Select Customer Zone"
+            options={securityQuestions}
+            value={formData.zone}
+            onChange={handleZone}
+            error={errors.securityQuestion}
+            required
           />
         </motion.div>
       </div>

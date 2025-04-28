@@ -12,21 +12,13 @@ const MultiStepForm: React.FC = () => {
     // Customer info
     firstName: "",
     lastName: "",
-    email: "",
     phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
+    zone: "",
+    occupation: "",
 
     // Account info
-    username: "",
-    password: "",
-    confirmPassword: "",
-    securityQuestion: "",
-    securityAnswer: "",
-    agreeToTerms: false,
-    marketingEmails: false,
+    initial_deposit: 0,
+    currentBalance: 0,
   });
 
   const updateFormData = (newData: Partial<FormData>) => {
@@ -74,7 +66,6 @@ const MultiStepForm: React.FC = () => {
   };
 
   const submitForm = () => {
-    // Here you would typically send the form data to your backend
     console.log("Form submitted:", formData);
 
     // Show success message
@@ -88,11 +79,11 @@ const MultiStepForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div className="bg-emerald-800 py-6 px-8">
-        <h1 className="text-white text-2xl md:text-3xl font-bold text-center">
-          Create Your Account
-        </h1>
+    <div className="px-8 w-full bg-white overflow-hidden py-10">
+      <h1 className="text-black text-2xl md:text-3xl font-bold ">
+        Create a new customer account
+      </h1>
+      <div className="">
         <ProgressBar currentStep={step} totalSteps={3} />
       </div>
 
@@ -127,8 +118,7 @@ const MultiStepForm: React.FC = () => {
                 Account Created Successfully!
               </h2>
               <p className="text-gray-600 mb-8">
-                Thank you for creating an account with us. We've sent a
-                confirmation email to {formData.email}.
+                Thank you for creating an account with us.
               </p>
               <button
                 onClick={() => setStep(1)}
