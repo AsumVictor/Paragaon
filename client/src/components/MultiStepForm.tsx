@@ -5,6 +5,8 @@ import AccountInfo from "./AccountInfo";
 import { FormData } from "@/types/inputs";
 import ReviewInfo from "./ReviewInfo";
 import ProgressBar from "./ProgressBar";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const MultiStepForm: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -68,6 +70,19 @@ const MultiStepForm: React.FC = () => {
   const submitForm = () => {
     console.log("Form submitted:", formData);
 
+    setFormData({
+      // Customer info
+      firstName: "",
+      lastName: "",
+      phone: "",
+      zone: "",
+      occupation: "",
+
+      // Account info
+      initial_deposit: 0,
+      currentBalance: 0,
+    });
+
     // Show success message
     setStep(4);
   };
@@ -79,11 +94,18 @@ const MultiStepForm: React.FC = () => {
   };
 
   return (
-    <div className="px-8 w-full bg-white overflow-hidden py-10">
-      <h1 className="text-black text-2xl md:text-3xl font-bold ">
-        Create a new customer account
+    <div className="px-8 w-full bg-white overflow-hidden pb-10">
+      <h1 className="text-black text-2xl md:text-3xl font-bold flex gap-5 items-center">
+        <Link
+          to=".."
+          relative="path"
+          className=" text-3xl bg-emerald-800 py-2 px-5 text-white font-[900] rounded-2xl"
+        >
+          <ArrowLeft />
+        </Link>
+        <span>Create a new customer account</span>
       </h1>
-      <div className="">
+      <div className="mt-5">
         <ProgressBar currentStep={step} totalSteps={3} />
       </div>
 
