@@ -119,7 +119,7 @@ const AccountInfo: React.FC<AccountInfoProps> = ({
           animate="visible"
         >
           <FormInput
-            label="How much has customer reverse to saved as current balance"
+            label="How much has customer reserve to saved as current balance"
             name="currentBalance"
             type="number"
             value={formData.currentBalance}
