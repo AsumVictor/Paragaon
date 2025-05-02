@@ -1,5 +1,5 @@
 from flask import jsonify
-from queries.customer_account import create_new_customer_and_account
+from queries.customer_account import create_new_customer_and_account, login
 from queries.index import BASEQUERY
 
 # create a new customer and account
@@ -20,3 +20,24 @@ def create_customer(data):
     result = BASEQUERY(query)
 
     return jsonify({"success": True, "message": "Customer account created", "data": result})
+
+
+def login_user(data):
+    email = data.get('email')
+    password = data.get('password')
+
+    query = login(email, password)
+    result = BASEQUERY(query)
+
+    if len(result) == 0:
+        return jsonify({"success": False, "message": "Invalid Credentials!!! please input a valid credentials", "data": None}), 400
+
+    details = {
+        "employeeID": result[0][2],
+        "fullName": result[0][3],
+        "role": result[0][0],
+        "zoneId": result[0][1],
+        "zoneName": result[0][4], 
+        }
+
+    return jsonify({"success": True, "data": details}), 200

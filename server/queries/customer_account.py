@@ -20,3 +20,21 @@ def create_new_customer_and_account(current_balance, first_name, initial_deposit
         COMMIT;
         """
     return res
+
+
+def login(email, password):
+    res = f"""
+    SELECT 
+    r.roleTitle AS jobTitle,
+    e.zoneID,
+    e.employeeID AS customerID,
+    CONCAT(e.firstName, ' ', e.lastName) AS fullName,
+    z.zoneName
+    FROM Employee e
+    JOIN Role r ON e.roleID = r.roleID
+    JOIN Zone z ON e.zoneID = z.zoneID
+    WHERE e.email = '{email}' AND e.password = '{password}';
+
+    """
+
+    return res

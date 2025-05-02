@@ -1,7 +1,8 @@
+import { API_BASE_URL } from "@/config/config";
 import { MOCK_USERS } from "@/data/demoUsers";
 import { AuthContextType, User } from "@/types/auth";
+import axios from "axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
-
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,32 +31,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     password: string
   ): Promise<{ success: boolean; message: string }> => {
     setIsLoading(true);
+    console.log(email, password);
+    try {
+      const { data } = await axios.post(`${API_BASE_URL}/customer/login`, {
+        email,
+        password,
+      });
+      const {
+        data: user,
+        success,
+      }: {
+        data: User;
+        success: boolean;
+      } = data;
 
-    //
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const foundUser = MOCK_USERS.find(
-          (u) => u.email === email && u.password === password
-        );
+      if (!success) {
+        throw new Error("Error occured! Try again");
+      }
 
-        if (foundUser) {
-          const userInfo = {
-            id: foundUser.id,
-            name: foundUser.name,
-            role: foundUser.role,
-          };
-          setUser(userInfo);
-          localStorage.setItem("user", JSON.stringify(userInfo));
-          resolve({ success: true, message: "Login Sucessfull" });
-        } else {
-          resolve({
-            success: false,
-            message: "Email or Password may be wrong",
-          });
-        }
-        setIsLoading(false);
-      }, 500);
-    });
+      setIsLoading(false);
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      return { success: true, message: "Login sucess" };
+    } catch (error) {
+      const errMEssage = error.response
+        ? error.response?.data?.message
+        : error.message;
+      setIsLoading(false);
+      return { success: false, message: errMEssage };
+    }
+
+    
   };
 
   const logout = () => {

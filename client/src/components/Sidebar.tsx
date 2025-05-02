@@ -18,7 +18,7 @@ interface SidebarProps {
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const { user, logout } = useAuth();
 
-  const routes = user ? roleBasedRoutes[user.role] : [];
+  const routes = user ? roleBasedRoutes[user.role.toLocaleLowerCase()] : [];
 
   return (
     <aside

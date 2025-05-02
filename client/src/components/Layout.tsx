@@ -12,6 +12,8 @@ const Layout = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
 
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -46,7 +48,7 @@ const Layout = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
-              {user.name} - ({user.role})
+              {user.fullName} - ({user.role})
             </span>
           </div>
           
