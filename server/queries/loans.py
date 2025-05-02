@@ -111,28 +111,11 @@ def get_loans_by_customer(customer_id):
     """
     return res
 
-# Query to get all loans with their details and the employee who issued them
+# Query to get all disbursed loans with their details and the employee who issued them It is a VIEW in the database
 
-def get_disbursed_loans_with_employee():
-    res = f"""
-    SELECT 
-        l.loanID,
-        CONCAT(c.firstName, ' ', c.lastName) AS customerName,
-        l.loanAmount,
-        l.amountSettled,
-        l.outstandingAmount,
-        CONCAT(e.firstName, ' ', e.lastName) AS issuedBy,
-        l.approvalDate,
-        lt.loanTypeName,
-        l.loanStatus
-    FROM Loan l
-    INNER JOIN Customer c ON l.customerID = c.customerID
-    INNER JOIN Employee e ON l.issuedBy = e.employeeID
-    INNER JOIN LoanType lt ON l.loanTypeID = lt.loanTypeID
-    WHERE l.loanStatus = 'DISBURSED'
-    ORDER BY l.approvalDate DESC;
-    """
-    return res
+def get_all_disbursed_loans():
+    return "SELECT * FROM DisbursedLoans ORDER BY approvalDate DESC;"
+
 
 # Similar to the above but for all loans in a specific zone settled or not
 def get_all_loans_by_zone(zone_id):
