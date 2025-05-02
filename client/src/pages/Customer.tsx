@@ -1,7 +1,6 @@
 import RequireRoleAccess from "@/auth/RequireRoleAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import Customer_collector from "@/screens/collector/CustomerList";
-import React from "react";
 
 function Customer() {
   const { user } = useAuth();
@@ -10,10 +9,10 @@ function Customer() {
     return <div className="">Admin</div>;
   }
 
-  if (user.role == "collector") {
+  if (user.role == "Collector") {
     return (
       <div className="">
-        <RequireRoleAccess allowedUsers={["collector"]}>
+        <RequireRoleAccess allowedUsers={["Collector"]}>
           <Customer_collector />
         </RequireRoleAccess>
       </div>

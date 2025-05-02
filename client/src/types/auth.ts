@@ -16,13 +16,15 @@ export interface AuthFormData {
 
   
   // Define user roles
-  export type UserRole = "admin" | "collector" | "risk";
+  export type UserRole = "admin" | "Collector" | "risk";
   
   // Define user type
   export interface User {
-    id: string;
-    name: string;
+    employeeID: string;
+    fullName: string;
     role: UserRole;
+    zoneId: string
+    zoneName: string
   }
   
   // Define auth context type
@@ -35,3 +37,12 @@ export interface AuthFormData {
     logout: () => void;
     isLoading: boolean;
   }
+
+export interface Customer {
+    id: string;
+    name: string;
+    status: string;
+    occupation: string;
+    phone: string;
+    zone: string;
+}[]

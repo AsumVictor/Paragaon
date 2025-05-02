@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import FormInput from "./FormInput";
-import { CustomerInfoProps } from "@/types/inputs";
+import { CustomerInfoProps, Option } from "@/types/inputs";
 import CustomSelect from "./SelectInput";
+import { API_BASE_URL } from "@/config/config";
+import axios from "axios";
 
 const securityQuestions = [
   {
@@ -29,6 +31,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   nextStep,
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [zones, setZones] = useState<Option[]>([]);
 
   const validateField = (name: string, value: string): string => {
     switch (name) {
@@ -98,6 +101,31 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
       transition: { delay: i * 0.1, duration: 0.3 },
     }),
   };
+
+  useEffect(() => {
+    const fetchZone = async () => {
+      try {
+        const { data } = await axios.get(`${API_BASE_URL}/zone`);
+        const {
+          success,
+          data: zones_data,
+        }: {
+          success: boolean;
+          data: { zoneId: string; zoneName: string }[];
+        } = data;
+        if (success) {
+          const options: Option[] = zones_data.map((d) => {
+            return { value: d.zoneId, label: d.zoneName };
+          });
+          setZones(options);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchZone();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -185,7 +213,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
         >
           <CustomSelect
             label="Select Customer Zone"
-            options={securityQuestions}
+            options={zones}
             value={formData.zone}
             onChange={handleZone}
             error={errors.securityQuestion}

@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 mysql = MySQL()
 
@@ -18,5 +19,12 @@ def create_app():
 
     from routes.index import index_bp
     app.register_blueprint(index_bp, url_prefix='/api')
+
+    env = os.getenv('FLASK_ENV', 'development')
+
+    if env == 'production':
+        CORS(app, origins=['https://paragaon.vercel.app'])
+    else:
+        CORS(app)
 
     return app

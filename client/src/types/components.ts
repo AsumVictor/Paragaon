@@ -9,4 +9,5 @@ export interface ReviewInfoProps {
     formData: FormData;
     prevStep: () => void;
     submitForm: () => void;
+    isLoading: boolean
   }

@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Settings, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/config";
+import { useAuth } from "@/contexts/AuthContext";
+import { Customer } from "@/types/auth";
 
 const customers = [
   {
@@ -27,6 +31,39 @@ const customers = [
 
 const Customer_collector: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          `${API_BASE_URL}/customer/collector/${user.zoneId}`
+        );
+        const {
+          success,
+          data: customers,
+        }: {
+          success: boolean;
+          data: Customer[];
+        } = data;
+
+        if (!success) {
+          throw new Error("Unable to fetch customers");
+        }
+
+        setCustomers(customers);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    };
+
+    fetchCustomer();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -42,8 +79,8 @@ const Customer_collector: React.FC = () => {
       </div>
 
       <div className="bg-white shadow rounded-lg">
-
         <div className="px-4 py-5 sm:p-6">
+          {/* Search  */}
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">
               <div className="mt-2 flex items-center space-x-4">
@@ -55,13 +92,17 @@ const Customer_collector: React.FC = () => {
                   />
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
-                <button title="create" className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                <button
+                  title="create"
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                >
                   <Settings className="h-4 w-4" />
                 </button>
               </div>
             </div>
           </div>
 
+          {/* customers */}
           <div className="mt-6 flow-root">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -106,49 +147,81 @@ const Customer_collector: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {customers.map((customer) => (
-                      <tr key={customer.id}>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-0">
-                          {customer.id}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <div className="flex items-center">
-                            <img
-                              className="h-8 w-8 rounded-full"
-                              src={customer.avatar}
-                              alt=""
-                            />
-                            <div className="ml-4">
-                              <div className="font-medium text-gray-900">
-                                {customer.name}
+
+                  {isLoading ? (
+                    <tbody className="divide-y divide-gray-200 animate-pulse">
+                      {[...Array(5)].map((_, index) => (
+                        <tr key={index}>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
+                            <div className="h-4 w-12 bg-gray-300 rounded"></div>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="flex items-center">
+                              <div className="h-8 w-8 rounded-full bg-gray-300"></div>
+                              <div className="ml-4">
+                                <div className="h-4 w-24 bg-gray-300 rounded"></div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {customer.phone}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {customer.occupation}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {customer.zone}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <span
-                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                              customer.status === "Active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {customer.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="h-4 w-20 bg-gray-300 rounded"></div>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="h-4 w-28 bg-gray-300 rounded"></div>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="h-4 w-16 bg-gray-300 rounded"></div>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="h-4 w-16 bg-gray-300 rounded"></div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  ) : customers.length == 0 ? (
+                    <p className=" text-emerald-800 font-semibold">
+                      You don't have any customer from your assigned zone
+                    </p>
+                  ) : (
+                    <tbody className="divide-y divide-gray-200">
+                      {customers.map((customer) => (
+                        <tr key={customer.id}>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-md text-gray-500 sm:pl-0">
+                            #{customer.id.slice(0,5).toUpperCase()}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <div className="flex items-center">
+                              <div className="">
+                                <div className="font-medium text-gray-900">
+                                  {customer.name}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {customer.phone}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {customer.occupation}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {customer.zone}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <span
+                              className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                                customer.status.toLocaleLowerCase() === "active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {customer.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  )}
                 </table>
               </div>
             </div>

@@ -7,6 +7,9 @@ import ReviewInfo from "./ReviewInfo";
 import ProgressBar from "./ProgressBar";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/config";
+import { toast } from "sonner";
 
 const MultiStepForm: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -22,6 +25,7 @@ const MultiStepForm: React.FC = () => {
     initial_deposit: 0,
     currentBalance: 0,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const updateFormData = (newData: Partial<FormData>) => {
     setFormData((prevData) => ({ ...prevData, ...newData }));
@@ -60,6 +64,7 @@ const MultiStepForm: React.FC = () => {
             formData={formData}
             prevStep={prevStep}
             submitForm={submitForm}
+            isLoading={isLoading}
           />
         );
       default:
@@ -67,24 +72,40 @@ const MultiStepForm: React.FC = () => {
     }
   };
 
-  const submitForm = () => {
-    console.log("Form submitted:", formData);
+  const submitForm = async () => {
+    setIsLoading(true);
 
-    setFormData({
-      // Customer info
-      firstName: "",
-      lastName: "",
-      phone: "",
-      zone: "",
-      occupation: "",
+    try {
+      const { data } = await axios.post(
+        `${API_BASE_URL}/customer/create`,
+        formData
+      );
 
-      // Account info
-      initial_deposit: 0,
-      currentBalance: 0,
-    });
+      const { success } = data;
+      if (success) {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          phone: "",
+          zone: "",
+          occupation: "",
 
-    // Show success message
-    setStep(4);
+          initial_deposit: 0,
+          currentBalance: 0,
+        });
+
+        // Show success message
+        setStep(4);
+        setIsLoading(false);
+      } else {
+        throw new Error("Something Expected occured!");
+      }
+    } catch (error) {
+      toast.error("Error Acocount", {
+
+      });
+      setIsLoading(false);
+    }
   };
 
   const formVariants = {

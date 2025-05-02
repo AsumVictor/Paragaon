@@ -32,7 +32,7 @@ const App = () => (
               <Route
                 path="/customers/create"
                 element={
-                  <RequireRoleAccess allowedUsers={["collector"]}>
+                  <RequireRoleAccess allowedUsers={["Collector"]}>
                     <CreateCustomer />
                   </RequireRoleAccess>
                 }
