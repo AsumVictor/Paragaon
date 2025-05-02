@@ -31,7 +31,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
   nextStep,
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [zones, setZones] = useState<Option[]>();
+  const [zones, setZones] = useState<Option[]>([]);
 
   const validateField = (name: string, value: string): string => {
     switch (name) {
@@ -125,7 +125,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
     };
 
     fetchZone();
-  });
+  }, []);
 
   return (
     <form onSubmit={handleSubmit}>

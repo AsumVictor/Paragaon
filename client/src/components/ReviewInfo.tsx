@@ -1,11 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ReviewInfoProps } from "@/types/components";
+import Button from "./Button";
 
 const ReviewInfo: React.FC<ReviewInfoProps> = ({
   formData,
   prevStep,
   submitForm,
+  isLoading
 }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -161,7 +163,14 @@ const ReviewInfo: React.FC<ReviewInfoProps> = ({
           </svg>
           Previous
         </button>
-        <button
+        <Button type="submit" fullWidth 
+        isLoading={isLoading}
+        onClick={()=>submitForm()}
+        >
+          Log In
+        </Button>
+
+        {/* <button
           type="button"
           onClick={submitForm}
           className="px-6 py-3 bg-emerald-800 text-white rounded-lg shadow-md hover:bg-emerald-700 transition-colors duration-300 flex items-center group"
@@ -179,7 +188,7 @@ const ReviewInfo: React.FC<ReviewInfoProps> = ({
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </button> */}
       </motion.div>
     </div>
   );
