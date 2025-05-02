@@ -37,3 +37,12 @@ export interface AuthFormData {
     logout: () => void;
     isLoading: boolean;
   }
+
+export interface Customer {
+    id: string;
+    name: string;
+    status: string;
+    occupation: string;
+    phone: string;
+    zone: string;
+}[]

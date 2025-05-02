@@ -38,3 +38,22 @@ def login(email, password):
     """
 
     return res
+
+
+def customer_by_zone(zoneId):
+    res = f"""
+    
+        SELECT 
+        c.customerID,
+        sa.accountStatus,
+        c.phoneNumber,
+        c.occupation,
+        z.zoneName,
+        CONCAT(c.firstName, ' ', c.lastName) AS fullName
+        FROM Customer c
+        LEFT JOIN SavingsAccount sa ON c.customerID = sa.customerID
+        INNER JOIN Zone z ON c.zoneID = z.zoneID
+        WHERE c.zoneID = '{zoneId}';
+    """
+    
+    return res
