@@ -2,112 +2,156 @@ import uuid
 from utils.utils import get_current_date
 
 
-# Query to create a collateral for a customer 
-def apply_collateral(customer_id, collateral_type_id, value, description, added_by):
-    collateral_id = str(uuid.uuid4()).replace("-", "_")
 
-    res = f"""
-    INSERT INTO Collateral (
-        collateralID, customerID, collateralTypeID, value, description, addedBy, addedOn
-    ) VALUES (
-        '{collateral_id}', '{customer_id}', '{collateral_type_id}', {value}, '{description}', '{added_by}', '{get_current_date()}'
-    );
-    """
-    return res
-
-# Query to create a new loan application
-def apply_for_loan(customer_id, loan_type_id, amount, collateral_id, applied_by, issued_by):
-    loan_id = str(uuid.uuid4()).replace("-", "_")
-
+# This is a query to create a new loan application that will be used by collectors
+def apply_for_loan(customer_id, loan_type_id, loan_amount, collateral_id, issued_by):
+    loan_id = str(uuid.uuid4()).replace("-", '_')
     res = f"""
     START TRANSACTION;
 
-    -- Check if customer has unsettled loans
-    SELECT COUNT(*) AS activeLoans
-    FROM Loan
-    WHERE customerID = '{customer_id}' AND loanStatus != 'SETTLED';
-
-    -- Check if collateral value is at least 70% of the requested loan
-    SELECT value
-    FROM Collateral
-    WHERE collateralID = '{collateral_id}' AND value >= 0.7 * {amount};
-
-    -- If checks pass, insert the loan
     INSERT INTO Loan (
-        loanID, loanTypeID, approvalDate, approvedBy, loanAmount, loanStatus,
-        customerID, collateralID, amountSettled, outstandingAmount, issuedBy, applicationDate
-    )
-    VALUES (
-        '{loan_id}', '{loan_type_id}', '{get_current_date()}', '{applied_by}', {amount},
-        'PENDING', '{customer_id}', '{collateral_id}', 0.0, {amount}, '{issued_by}', '{get_current_date()}'
+        loanID, loanTypeID, approvalDate, approvedBy, loanAmount,
+        loanStatus, customerID, collateralID, amountSettled,
+        outstandingAmount, issuedBy, applicationDate
+    ) VALUES (
+        '{loan_id}', '{loan_type_id}', NULL, NULL, {loan_amount},
+        'PENDING', '{customer_id}', '{collateral_id}', 0,
+        {loan_amount}, '{issued_by}', '{get_current_date()}'
     );
 
     COMMIT;
     """
     return res
 
-# Query to get all people who owe loans with their details for a specific zone
-def owing_customers_by_zone(zone_id):
+# This is a  query that checks to see if a customer has any unsettled loans before applying for a new one
+def is_customer_eligible_for_loan(customer_id):
     res = f"""
     SELECT 
-        c.customerID,
-        CONCAT(c.firstName, ' ', c.lastName) AS fullName,
-        l.loanAmount,
-        l.outstandingAmount,
-        l.loanStatus,
-        z.zoneName
-    FROM Loan l
-    INNER JOIN Customer c ON l.customerID = c.customerID
-    INNER JOIN Zone z ON c.zoneID = z.zoneID
-    WHERE l.loanStatus != 'SETTLED' AND c.zoneID = '{zone_id}'
-    ORDER BY l.outstandingAmount DESC;
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 
+                FROM Loan 
+                WHERE customerID = '{customer_id}' 
+                AND loanStatus IN ('APPROVED', 'DISBURSED')
+                AND outstandingAmount > 0
+            ) 
+            THEN 'INELIGIBLE'
+            ELSE 'ELIGIBLE'
+        END AS eligibilityStatus;
     """
     return res
 
-# Query to process loan repayment
-def process_loan_repayment(loan_id, amount_paid, penalty_paid, employee_id):
-    repayment_id = str(uuid.uuid4()).replace("-", "_")
 
+# This is a query that sets a loan's satus to be Approved when the customer is eligible for a loan
+
+def approve_loan(loan_id, employee_id):
+    res = f"""
+    UPDATE Loan
+    SET loanStatus = 'APPROVED',
+        approvedBy = '{employee_id}',
+        approvalDate = '{get_current_date()}'
+    WHERE loanID = '{loan_id}' AND loanStatus = 'PENDING';
+    """
+    return res
+
+# This is a query that actually disburses the loan to the customer's account
+def disburse_loan(loan_id, employee_id):
     res = f"""
     START TRANSACTION;
 
-    -- Insert repayment
-    INSERT INTO LoanRepayment (
-        repaymentID, amountPaid, paymentDate, penaltyPaid, loanID, employeeID
-    ) VALUES (
-        '{repayment_id}', {amount_paid}, '{get_current_date()}', {penalty_paid}, '{loan_id}', '{employee_id}'
+    -- Update loan status
+    UPDATE Loan
+    SET loanStatus = 'DISBURSED',
+        issuedBy = '{employee_id}',
+        applicationDate = '{get_current_date()}'
+    WHERE loanID = '{loan_id}' AND loanStatus = 'APPROVED';
+
+    -- Update customer's savings account balance
+    UPDATE SavingsAccount
+    SET currentBalance = currentBalance + (
+        SELECT loanAmount FROM Loan WHERE loanID = '{loan_id}'
+    )
+    WHERE customerID = (
+        SELECT customerID FROM Loan WHERE loanID = '{loan_id}'
     );
 
-    -- Update outstanding and settled amount
+    COMMIT;
+    """
+    return res
+
+# This is a query to be used by collectors when processing loan repayments
+def loan_repayment(loan_id, amount_paid, penalty_paid, employee_id):
+    repayment_id = str(uuid.uuid4()).replace("-", '_')
+    res = f"""
+    START TRANSACTION;
+
+    -- Insert repayment record
+    INSERT INTO LoanRepayment (repaymentID, amountPaid, paymentDate, penaltyPaid, loanID, employeeID)
+    VALUES ('{repayment_id}', {amount_paid}, '{get_current_date()}', {penalty_paid}, '{loan_id}', '{employee_id}');
+
+    -- Update settled and outstanding amounts
     UPDATE Loan
-    SET 
-        amountSettled = amountSettled + {amount_paid},
-        outstandingAmount = outstandingAmount - {amount_paid},
-        loanStatus = CASE 
-            WHEN outstandingAmount - {amount_paid} <= 0 THEN 'SETTLED'
-            ELSE loanStatus
-        END
+    SET amountSettled = amountSettled + {amount_paid},
+        outstandingAmount = outstandingAmount - {amount_paid}
     WHERE loanID = '{loan_id}';
 
+    -- Mark as SETTLED if outstanding is zero or less
+    UPDATE Loan
+    SET loanStatus = 'SETTLED'
+    WHERE loanID = '{loan_id}' AND outstandingAmount <= 0;
+
     COMMIT;
     """
     return res
 
-# Query to get all loans for a specific customer We can use it for the credit managers if they want to see all loans for a specific customer
-def get_loans_by_customer(customer_id):
+
+# Query to get all people who owe loans with their details for a specific zone - This will be used by the collectors
+def get_loan_defaulters_by_zone(zone_id):
     res = f"""
-    SELECT 
+    SELECT
+        c.customerID,
+        CONCAT(c.firstName, ' ', c.lastName) AS fullName,
+        c.phoneNumber,
+        z.zoneName,
+        l.loanID,
+        l.loanAmount,
+        l.amountSettled,
+        l.outstandingAmount,
+        l.loanStatus,
+        lt.loanTypeName,
+        l.approvalDate,
+        DATE_ADD(l.approvalDate, INTERVAL lt.loanLifespan MONTH) AS dueDate
+    FROM Customer c
+    JOIN Loan l ON c.customerID = l.customerID
+    JOIN Zone z ON c.zoneID = z.zoneID
+    JOIN LoanType lt ON l.loanTypeID = lt.loanTypeID
+    WHERE c.zoneID = '{zone_id}'
+      AND l.outstandingAmount > 0
+      AND l.loanStatus IN ('DISBURSED', 'APPROVED');
+    """
+    return res
+
+# Query to get all loans a specific customer has applied for
+def get_customer_loans(customer_id):
+    res = f"""
+    SELECT
         l.loanID,
         lt.loanTypeName,
         l.loanAmount,
         l.amountSettled,
         l.outstandingAmount,
         l.loanStatus,
-        l.applicationDate
+        l.approvalDate,
+        l.applicationDate,
+        l.collateralID,
+        c.firstName AS customerFirstName,
+        c.lastName AS customerLastName,
+        c.phoneNumber AS customerPhone,
+        c.occupation AS customerOccupation
     FROM Loan l
-    INNER JOIN LoanType lt ON l.loanTypeID = lt.loanTypeID
-    WHERE l.customerID = '{customer_id}'
-    ORDER BY l.applicationDate DESC;
+    JOIN LoanType lt ON l.loanTypeID = lt.loanTypeID
+    JOIN Customer c ON l.customerID = c.customerID
+    WHERE l.customerID = '{customer_id}';
     """
     return res
 
@@ -117,23 +161,30 @@ def get_all_disbursed_loans():
     return "SELECT * FROM DisbursedLoans ORDER BY approvalDate DESC;"
 
 
-# Similar to the above but for all loans in a specific zone settled or not
-def get_all_loans_by_zone(zone_id):
+# This is a query to be used by the credit manahager to get all loans that are unsettled and their details for all zones
+def get_all_defaulters():
     res = f"""
-    SELECT 
+    SELECT
+        c.customerID,
+        CONCAT(c.firstName, ' ', c.lastName) AS fullName,
+        c.phoneNumber,
+        c.occupation,
+        z.zoneName,
         l.loanID,
-        CONCAT(c.firstName, ' ', c.lastName) AS customerName,
         l.loanAmount,
         l.amountSettled,
         l.outstandingAmount,
         l.loanStatus,
         lt.loanTypeName,
-        z.zoneName,
-        l.approvalDate
+        DATE_ADD(l.approvalDate, INTERVAL lt.loanLifespan MONTH) AS dueDate
     FROM Loan l
-    INNER JOIN Customer c ON l.customerID = c.customerID
-    INNER JOIN Zone z ON c.zoneID = z.zoneID
-    WHERE c.zoneID = '{zone_id}'
-    ORDER BY l.approvalDate DESC;
+    JOIN Customer c ON l.customerID = c.customerID
+    JOIN Zone z ON c.zoneID = z.zoneID
+    JOIN LoanType lt ON l.loanTypeID = lt.loanTypeID
+    WHERE l.outstandingAmount > 0
+    ORDER BY z.zoneName;
     """
     return res
+
+
+
