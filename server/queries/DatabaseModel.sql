@@ -120,5 +120,3 @@ CREATE TABLE IF NOT EXISTS Transaction (
     FOREIGN KEY (savingsAccountID) REFERENCES SavingsAccount(savingsAccountID),
     FOREIGN KEY (processedBy) REFERENCES Employee(employeeID)
 );
-
-select * from Employee;
