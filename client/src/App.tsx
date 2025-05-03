@@ -5,16 +5,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
-import Messages from "./pages/Messages";
+import LoanDetails from "./pages/LoanDetails";
 import Notifications from "./pages/Notifications";
 import Transaction from "./pages/Transaction";
-import Settings from "./pages/Loan";
+import Loan from "./pages/Loan";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import Layout from "./components/Layout";
 import Customer from "./pages/Customer";
 import RequireRoleAccess from "./auth/RequireRoleAccess";
 import CreateCustomer from "./screens/collector/CreateCustomerAccount";
+import RequestLoans from "./pages/LoanRequests";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +40,27 @@ const App = () => (
               />
               <Route path="/saving-account" element={<Notifications />} />
               <Route path="/transactions" element={<Transaction />} />
-              <Route path="/loans" element={<Settings />} />
+              <Route path="/loans" element={<Loan />} />
+
+              <Route
+                path="/loans/:id"
+                element={
+                  <RequireRoleAccess allowedUsers={["Credit_manager"]}>
+                    <LoanDetails />
+                  </RequireRoleAccess>
+                }
+              />
+
+<Route
+                path="/loans-request"
+                element={
+                  <RequireRoleAccess allowedUsers={["Credit_manager"]}>
+                    <RequestLoans />
+                  </RequireRoleAccess>
+                }
+              />
+
+
             </Route>
             <Route path="*" element={<NotFound />} />
 

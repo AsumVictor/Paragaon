@@ -31,7 +31,7 @@ const roleBasedRoutes = {
   credit_manager: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { label: "Loans", icon: FileText, href: "/loans" }, // view loans by zone/status
-    { label: "Request New Loan", icon: PlusCircle, href: "/loans/request" }, // create new loan request
+    { label: "Request New Loan", icon: PlusCircle, href: "/loans-request" }, // create new loan request
     { label: "Approve Loans", icon: CheckCircle2, href: "/loans/approvals" }, // approve loans
   ],
 };
