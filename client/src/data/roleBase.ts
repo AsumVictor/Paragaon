@@ -24,7 +24,6 @@ const roleBasedRoutes = {
   collector: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { label: "Customers", icon: Users, href: "/customers" }, // create + view customers
-    { label: "Savings Accounts", icon: PiggyBank, href: "/savings-accounts" }, // create + view accounts
     { label: "Transactions", icon: Banknote, href: "/transactions" }, // make + view collector's transactions
     { label: "Loans", icon: FileText, href: "/loans" }, // view and filter loans
   ],

@@ -7,7 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
-import Projects from "./pages/Projects";
+import Transaction from "./pages/Transaction";
 import Settings from "./pages/Loan";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
@@ -38,7 +38,7 @@ const App = () => (
                 }
               />
               <Route path="/saving-account" element={<Notifications />} />
-              <Route path="/transaction" element={<Projects />} />
+              <Route path="/transactions" element={<Transaction />} />
               <Route path="/loans" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
