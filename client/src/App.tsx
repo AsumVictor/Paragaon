@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Projects from "./pages/Projects";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Loan";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import Layout from "./components/Layout";
