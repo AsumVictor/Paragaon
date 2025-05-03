@@ -4,11 +4,18 @@ from utils.utils import get_current_date
 
 
 # This is a query to create a new loan application that will be used by collectors
-def apply_for_loan(customer_id, loan_type_id, loan_amount, collateral_id, issued_by):
+def apply_for_loan_with_collateral(customer_id, loan_type_id, loan_amount, collateral_name, collateral_value, issued_by):
     loan_id = str(uuid.uuid4()).replace("-", '_')
+    collateral_id = str(uuid.uuid4()).replace("-", '_')
+
     res = f"""
     START TRANSACTION;
 
+    -- Create collateral
+    INSERT INTO Collateral (collateralID, name, value)
+    VALUES ('{collateral_id}', '{collateral_name}', {collateral_value});
+
+    -- Create loan application
     INSERT INTO Loan (
         loanID, loanTypeID, approvalDate, approvedBy, loanAmount,
         loanStatus, customerID, collateralID, amountSettled,
@@ -22,6 +29,7 @@ def apply_for_loan(customer_id, loan_type_id, loan_amount, collateral_id, issued
     COMMIT;
     """
     return res
+
 
 # This is a  query that checks to see if a customer has any unsettled loans before applying for a new one
 def is_customer_eligible_for_loan(customer_id):
