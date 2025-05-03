@@ -32,3 +32,5 @@ def create_new_transaction(data):
         return jsonify({"success": False, "message": "Will implement later", "data": None}), 400
     else:
         return jsonify({"success": False, "message": "Invalid Transaction Type", "data": None}), 400
+
+
