@@ -32,7 +32,7 @@ def login(email, password):
     z.zoneName
     FROM Employee e
     JOIN Role r ON e.roleID = r.roleID
-    JOIN Zone z ON e.zoneID = z.zoneID
+    LEFT JOIN Zone z ON e.zoneID = z.zoneID
     WHERE e.email = '{email}' AND e.password = '{password}';
 
     """

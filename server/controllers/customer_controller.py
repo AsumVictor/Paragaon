@@ -29,9 +29,9 @@ def login_user(data):
     query = login(email, password)
     result = BASEQUERY(query)
 
+    print(result)
     if len(result) == 0:
         return jsonify({"success": False, "message": "Invalid Credentials!!! please input a valid credentials", "data": None}), 400
-
     details = {
         "employeeID": result[0][2],
         "fullName": result[0][3],
