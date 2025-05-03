@@ -1,8 +1,7 @@
-import MultiStepForm from "@/components/MultiStepForm";
-import React from "react";
+import AccountCreation from "@/components/CustomerCreation";
 
 function CreateCustomerAccount() {
-  return <MultiStepForm />;
+  return <AccountCreation />;
 }
 
 export default CreateCustomerAccount;

@@ -16,7 +16,7 @@ export interface AuthFormData {
 
   
   // Define user roles
-  export type UserRole = "admin" | "Collector" | "risk";
+  export type UserRole = "admin" | "Collector" | "Credit_manager";
   
   // Define user type
   export interface User {

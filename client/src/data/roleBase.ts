@@ -29,7 +29,7 @@ const roleBasedRoutes = {
     { label: "Loans", icon: FileText, href: "/loans" }, // view and filter loans
   ],
 
-  risk: [
+  Credit_manager: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { label: "Loans", icon: FileText, href: "/loans" }, // view loans by zone/status
     { label: "Request New Loan", icon: PlusCircle, href: "/loans/request" }, // create new loan request
