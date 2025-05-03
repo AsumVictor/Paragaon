@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS Customer (
 -- LoanType table
 CREATE TABLE IF NOT EXISTS LoanType (
     loanTypeID VARCHAR(50) PRIMARY KEY,
-    loanTypeName VARCHAR(255),
+    loanTypeName VARCHAR(255), name VARCHAR(255),
+    value DECIMAL(10,2),
     loanLifespan INT,
     minimumLoanAmount DECIMAL(10,2),
     maximumLoanAmount DECIMAL(10,2),
@@ -55,8 +56,7 @@ CREATE TABLE IF NOT EXISTS LoanType (
 -- Collateral table
 CREATE TABLE IF NOT EXISTS Collateral (
     collateralID VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(255),
-    value DECIMAL(10,2)
+   
 );
 
 -- Loan table
@@ -120,5 +120,3 @@ CREATE TABLE IF NOT EXISTS Transaction (
     FOREIGN KEY (savingsAccountID) REFERENCES SavingsAccount(savingsAccountID),
     FOREIGN KEY (processedBy) REFERENCES Employee(employeeID)
 );
-
-select * from Employee;

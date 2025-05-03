@@ -6,24 +6,6 @@ import CustomSelect from "./SelectInput";
 import { API_BASE_URL } from "@/config/config";
 import axios from "axios";
 
-const securityQuestions = [
-  {
-    value: "dadafefewfewfwe",
-    label: "Zone A",
-  },
-  {
-    value: "ewf43fecsdfer",
-    label: "Zone B",
-  },
-  {
-    value: "fe;fkpewpoiorj",
-    label: "Zone C",
-  },
-  {
-    value: "ddwowd9knkn",
-    label: "Zone D",
-  },
-];
 
 const CustomerInfo: React.FC<CustomerInfoProps> = ({
   formData,
