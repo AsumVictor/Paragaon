@@ -24,15 +24,14 @@ const roleBasedRoutes = {
   collector: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { label: "Customers", icon: Users, href: "/customers" }, // create + view customers
-    { label: "Savings Accounts", icon: PiggyBank, href: "/savings-accounts" }, // create + view accounts
     { label: "Transactions", icon: Banknote, href: "/transactions" }, // make + view collector's transactions
     { label: "Loans", icon: FileText, href: "/loans" }, // view and filter loans
   ],
 
-  Credit_manager: [
+  credit_manager: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { label: "Loans", icon: FileText, href: "/loans" }, // view loans by zone/status
-    { label: "Request New Loan", icon: PlusCircle, href: "/loans/request" }, // create new loan request
+    { label: "Request New Loan", icon: PlusCircle, href: "/loans-request" }, // create new loan request
     { label: "Approve Loans", icon: CheckCircle2, href: "/loans/approvals" }, // approve loans
   ],
 };

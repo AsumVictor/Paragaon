@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS Employee (
     FOREIGN KEY (roleID) REFERENCES Role(roleID)
 );
 
+select * from Role;
+select * from Employee;
+insert into Employee values ("fyfgfbkjbf77sdfbjfbjdsf_vdsv", "Owerku", "Bamsah", "risk@123", "0543895832", "Owerku.Bamsah@paragon.com", NULL, "RISK1001", "2025/05/05");
+
 -- Customer table
 CREATE TABLE IF NOT EXISTS Customer (
     customerID VARCHAR(50) PRIMARY KEY,

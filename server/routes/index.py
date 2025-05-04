@@ -5,7 +5,6 @@ from routes.zone import zone_bp
 from routes.customer import customer_bp
 from routes.transaction import transaction_bp
 from routes.loans import loans_bp
-
  
 index_bp = Blueprint('index_bp', __name__)
 
