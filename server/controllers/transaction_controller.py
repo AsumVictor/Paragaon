@@ -14,10 +14,11 @@ def create_transaction(data):
     if transactionType == "TT001":  # Deposit
         query = perform_deposit(collectorID, customerID, amount)
         result = BASEQUERY(query)
-        if result.get("success"):
-            return jsonify({"success": True, "message": "Deposit successful", "data": None}), 200
-        else:
-            return jsonify({"success": False, "message": "Deposit failed", "data": None}), 400
+        print(result)
+        # if result.get("success"):
+        #     return jsonify({"success": True, "message": "Deposit successful", "data": None}), 200
+        # else:
+        return jsonify({"success": False, "message": "Deposit failed", "data": None}), 400
 
     # Withdrawals
     elif transactionType == "TT002":  
