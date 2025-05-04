@@ -9,23 +9,23 @@ def apply_for_loan(data):
     loan_type_id = data["loanTypeID"]
     loan_amount = data["loanAmount"]
     collateral_name = data["collateralName"]
-    collateral_value = data["collateralValue"]
+    collateral_value = data["value"]
     issued_by = data["issuedBy"]
 
     # Check customer eligibility for a loan
     eligibility_query = is_customer_eligible_for_loan(customer_id)
     eligibility_result = BASEQUERY(eligibility_query)
 
-    if eligibility_result.get("data", [{}])[0].get("eligibilityStatus") != "ELIGIBLE":
+    if eligibility_result[0][0] != "ELIGIBLE":
         return jsonify({"success": False, "message": "Customer not eligible for a loan", "data": None}), 400
 
     # Apply for the loan
-    query = apply_for_loan_with_collateral(customer_id, loan_type_id, loan_amount, collateral_name, collateral_value, issued_by)
-    result = BASEQUERY(query)
-
-    if result.get("success"):
+    query = apply_for_loan_with_collateral(
+        customer_id, loan_type_id, loan_amount, collateral_name, collateral_value, issued_by)
+    try:
+        BASEQUERY(query)
         return jsonify({"success": True, "message": "Loan application submitted", "data": None}), 200
-    else:
+    except:
         return jsonify({"success": False, "message": "Failed to submit loan application", "data": None}), 500
 
 
@@ -137,11 +137,11 @@ def get_all_disbursed_loans():
 
 
 # Get all loan defaulters
-def get_all_defaulters():
+def getDefaulters():
     query = get_all_defaulters()
     result = BASEQUERY(query)
 
-    if result.get("success"):
+    try:
         data = [
             {
                 "loanID": row[0],
@@ -150,8 +150,47 @@ def get_all_defaulters():
                 "dueAmount": row[3],
                 "status": row[4]
             }
-            for row in result["data"]
-        ]
+            for row in result]
+
         return jsonify({"success": True, "message": "All loan defaulters retrieved", "data": data}), 200
-    else:
+
+    except:
         return jsonify({"success": False, "message": "Failed to fetch all loan defaulters", "data": None}), 500
+
+# get all loans
+
+
+def allLoan():
+    try:
+        result = BASEQUERY(allLoans())
+        return jsonify({"success": True, "message": "Loan application submitted", "data": result}), 200
+    except:
+        return jsonify({"success": False, "message": "Failed to submit loan application", "data": None}), 500
+
+
+def isEligible(id):
+    try:
+        result = BASEQUERY(is_customer_eligible_for_loan(id))
+        isEligible = result[0][0] == "ELIGIBLE"
+        return jsonify({"success": True, "message": "Loan application submitted", "data": isEligible}), 200
+    except:
+        return jsonify({"success": False, "message": "Failed to submit loan application", "data": None}), 400
+
+
+def allLoanTypes():
+
+    try:
+        result = BASEQUERY("SELECT * from LoanType;")
+        data = [{
+            "id": row[0],
+            "loanTypeName": row[1],
+            "description": row[2],
+            "loanLifeSpan": row[3],
+            "minimumAmount": row[4],
+            "maxAmount": row[5],
+            "interest": row[6],
+        } for row in result]
+
+        return jsonify({"success": True, "data": data}), 200
+    except:
+        return jsonify({"success": False, "message": "Error occured", "data": None}), 400

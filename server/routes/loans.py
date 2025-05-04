@@ -3,15 +3,25 @@ from controllers.loans_controller import *
 loans_bp = Blueprint('loans_bp', __name__)
 
 
+@loans_bp.route('/', methods=['GET'])
+def fetch_all():
+    return allLoan()
+
+
 @loans_bp.route('/apply', methods=['POST'])
 def apply_loan():
     data = request.get_json()
     return apply_for_loan(data)
 
 
+@loans_bp.route('/types', methods=['GET'])
+def loan_types():
+    return allLoanTypes()
+
+
 @loans_bp.route('/eligibility/<customer_id>', methods=['GET'])
 def check_eligibility(customer_id):
-    return is_customer_eligible_for_loan(customer_id)
+    return isEligible(customer_id)
 
 
 @loans_bp.route('/approve', methods=['POST'])
@@ -50,7 +60,7 @@ def get_zone_defaulters(zone_id):
 
 @loans_bp.route('/defaulters/all', methods=['GET'])
 def get_all_loan_defaulters():
-    return get_all_defaulters()
+    return getDefaulters()
 
 
 @loans_bp.route('/customer/<customer_id>', methods=['GET'])

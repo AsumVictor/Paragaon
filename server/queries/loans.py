@@ -2,6 +2,8 @@ import uuid
 from utils.utils import get_current_date
 
 # This is a query to create a new loan application that will be used by collectors
+
+
 def apply_for_loan_with_collateral(customer_id, loan_type_id, loan_amount, collateral_name, collateral_value, issued_by):
     loan_id = str(uuid.uuid4()).replace("-", '_')
     collateral_id = str(uuid.uuid4()).replace("-", '_')
@@ -33,17 +35,26 @@ def apply_for_loan_with_collateral(customer_id, loan_type_id, loan_amount, colla
 def is_customer_eligible_for_loan(customer_id):
     res = f"""
     SELECT 
-        CASE 
-            WHEN EXISTS (
-                SELECT 1 
-                FROM Loan 
-                WHERE customerID = '{customer_id}' 
-                AND loanStatus IN ('APPROVED', 'DISBURSED')
-                AND outstandingAmount > 0
-            ) 
-            THEN 'INELIGIBLE'
-            ELSE 'ELIGIBLE'
-        END AS eligibilityStatus;
+    CASE 
+        WHEN NOT EXISTS (
+            SELECT 1 
+            FROM Customer c
+            WHERE c.customerID = '{customer_id}'
+        ) THEN 'INELIGIBLE'
+        
+        WHEN EXISTS (
+            SELECT 1 
+            FROM Loan 
+            WHERE customerID = '{customer_id}' 
+            AND loanStatus IN ('APPROVED', 'DISBURSED', "PENDING")
+            AND outstandingAmount > 0
+        ) THEN 'INELIGIBLE'
+        
+        ELSE 'ELIGIBLE'
+    END AS eligibilityStatus;
+
+
+
     """
     return res
 
@@ -189,4 +200,32 @@ def get_all_defaulters():
     WHERE l.outstandingAmount > 0
       AND l.loanStatus IN ('DISBURSED', 'APPROVED');
     """
+    return res
+
+
+def allLoans():
+
+    res = """
+    
+    SELECT
+    l.loanID,
+    lt.loanTypeName,
+    l.applicationDate AS dateApplied,
+    CONCAT(c.firstName, ' ', c.lastName) AS customerFullName,
+    CONCAT(e.firstName, ' ', e.lastName) AS issuedByEmployeeFullName,
+    l.loanStatus,
+    l.applicationDate
+    FROM 
+        Loan l
+    INNER JOIN 
+        LoanType lt ON l.loanTypeID = lt.loanTypeID
+    INNER JOIN 
+        Customer c ON l.customerID = c.customerID
+    INNER JOIN 
+        Employee e ON l.issuedBy = e.employeeID
+    ORDER BY 
+        l.applicationDate DESC;
+
+    """
+
     return res

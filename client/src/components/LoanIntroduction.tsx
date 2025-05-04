@@ -69,9 +69,30 @@ const LoanIntroduction: React.FC<any> = ({
     const curr_customer = customerList.find((c) => c.id == formData.customerID);
 
     setCurrCutomer(curr_customer);
+    // check eligibilty
+    const checkElibility = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          `${API_BASE_URL}/loans/eligibility/${formData.customerID}`
+        );
+        if (!data.success) {
+          throw new Error("Error occured");
+        }
+
+        setLoading(false);
+        setEligibleResult(true);
+        setEligility(data.data);
+      } catch (error) {
+        setLoading(false);
+        setEligibleResult(true);
+        setEligility(false);
+        console.log(error);
+      }
+    };
+
     if (currCustomer) {
-      setEligibleResult(true);
-      setEligility(true);
+      checkElibility();
     }
   }, [formData.customerID]);
 
@@ -199,6 +220,8 @@ const LoanIntroduction: React.FC<any> = ({
           </div>
         </div>
       )}
+
+      <div className="h-[3cm]"></div>
     </div>
   );
 };
