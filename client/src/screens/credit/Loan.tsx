@@ -64,7 +64,7 @@ export const LoanCard: React.FC<{ loan: Loan; url: string }> = ({
         </h2>
         <span
           className={`px-3 py-1 rounded-full text-sm font-medium ${
-            statusColors[loan.status]
+            statusColors[loan.status.toLowerCase()]
           }`}
         >
           {loan.status.toUpperCase()}
@@ -97,13 +97,12 @@ const LoansPage: React.FC = () => {
     const fetchCustomer = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/transaction`);
+        const { data } = await axios.get(`${API_BASE_URL}/loans/`);
         const { data: loans, success } = data;
         // if (!success) {
         //   throw new Error("Unable to fetch loans");
         // }
 
-        console.log(loans)
         setLoans(loans);
         setLoading(false);
       } catch (error) {
@@ -129,7 +128,7 @@ const LoansPage: React.FC = () => {
   <div className=" flex flex-col items-center p-8">
     <h1 className="text-3xl font-bold text-emerald-900 mb-8">Loan Overview</h1>
     <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-      {SAMPLE_LOANS.map((loan) => (
+      {loans.map((loan) => (
         <LoanCard url={`./${loan.id}`} key={loan.id} loan={loan} />
       ))}
     </div>

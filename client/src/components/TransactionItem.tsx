@@ -42,11 +42,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
             </span>
           </div>
           <div className="mt-2 text-sm text-gray-500">
-            ID: {transaction.transactionID.slice(0.5)} •{" "}
+            ID: {transaction.transactionID.slice(0.2)} •{" "}
             {transaction.transactionDate}
           </div>
           <div className="mt-1 text-xs text-gray-400">
-            Processed by: {transaction.processedBy}
+            Processed by: Me
           </div>
         </div>
         <motion.div
