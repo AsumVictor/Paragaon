@@ -1,6 +1,7 @@
 import RequireRoleAccess from "@/auth/RequireRoleAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import CollectorLoan from "@/screens/collector/Loan";
+import CreditManagerLoan from "@/screens/credit/Loan";
 
 const Loan = () => {
   const { user } = useAuth();
@@ -22,9 +23,10 @@ const Loan = () => {
   }
 
   if (user.role == "Credit_manager") {
+
     return (
-      <RequireRoleAccess allowedUsers={["Collector"]}>
-        <CollectorLoan />
+      <RequireRoleAccess allowedUsers={["Credit_manager"]}>
+        <CreditManagerLoan />
       </RequireRoleAccess>
     );
   }
