@@ -4,6 +4,9 @@ import TransactionFilters from "@/components/TransactionFilters";
 import TransactionList from "@/components/TransactionList";
 import AddTransactionModal from "@/components/AddTransactionModal";
 import Button from "@/components/Button";
+import axios from "axios";
+import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/config/config";
 
 const SAMPLE_TRANSACTIONS: t[] = [
   {
@@ -57,13 +60,15 @@ const SAMPLE_TRANSACTIONS: t[] = [
 ];
 
 function Transaction() {
-  const [transactions, setTransactions] = useState<t[]>(SAMPLE_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<t[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<t[]>([]);
   const [transactionTypes, setTransactionTypes] = useState<string[]>([]);
   const [periodFilter, setPeriodFilter] =
     useState<TransactionFilterPeriod>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     // check type
@@ -72,13 +77,44 @@ function Transaction() {
       all_transactions = all_transactions.filter((t) => t.type == typeFilter);
     }
 
-    // Will handle this properly when i'm done
-    if (periodFilter != "all") {
-      all_transactions = all_transactions.filter((t) => t.type == periodFilter);
-    }
+    // // Will handle this properly when i'm done
+    // if (periodFilter != "all") {
+    //   all_transactions = all_transactions.filter((t) => t.type == periodFilter);
+    // }
 
     setFilteredTransactions(all_transactions);
-  }, [periodFilter, typeFilter, setTypeFilter, setPeriodFilter]);
+  }, [transactions, periodFilter, typeFilter, setTypeFilter, setPeriodFilter]);
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${API_BASE_URL}/transaction/zone/${user.zoneId}`
+      );
+      const {
+        success,
+        data: transactions,
+      }: {
+        success: boolean;
+        data: t[];
+      } = data;
+
+      console.log(data);
+
+      if (!success) {
+        throw new Error("Unable to fetch customers");
+      }
+
+      setLoading(false);
+      setTransactions(transactions);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -90,24 +126,32 @@ function Transaction() {
           Make a Transaction
         </Button>
       </div>
+      {isLoading ? (
+        <>
+          <p>LOADING TRANSACTIONS..</p>
+        </>
+      ) : (
+        <main className=" py-8">
+          <div className="">
+            <TransactionFilters
+              periodFilter={periodFilter}
+              typeFilter={typeFilter}
+              transactionTypes={transactionTypes}
+              onPeriodChange={setPeriodFilter}
+              onTypeChange={setTypeFilter}
+            />
 
-      <main className=" py-8">
-        <div className="">
-          <TransactionFilters
-            periodFilter={periodFilter}
-            typeFilter={typeFilter}
-            transactionTypes={transactionTypes}
-            onPeriodChange={setPeriodFilter}
-            onTypeChange={setTypeFilter}
-          />
-
-          <TransactionList transactions={filteredTransactions} />
-        </div>
-      </main>
+            <TransactionList transactions={filteredTransactions} />
+          </div>
+        </main>
+      )}
 
       <AddTransactionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          fetchTransactions();
+        }}
         onAddTransaction={() => console.log("object")}
       />
     </div>

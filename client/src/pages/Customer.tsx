@@ -19,7 +19,7 @@ function Customer() {
     );
   }
 
-  if (user.role == "risk") {
+  if (user.role == "Credit_manager") {
     return <div className="">Risk Manager</div>;
   }
 

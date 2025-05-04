@@ -2,7 +2,9 @@ import CollateralInfo from "@/components/CollateralInfo";
 import LoadForm from "@/components/LoadForm";
 import LoanIntroduction from "@/components/LoanIntroduction";
 import { MultiStepForm } from "@/components/MultiStepForm";
+import { API_BASE_URL } from "@/config/config";
 import { useAuth } from "@/contexts/AuthContext";
+import axios from "axios";
 import { Link } from "react-router-dom";
 
 function CollectorLoan() {
@@ -21,8 +23,19 @@ function CollectorLoan() {
   };
 
   const onSubmit = async (data: typeof formData) => {
-    console.log("Form submitted", data);
-    return new Promise<void>((resolve) => setTimeout(resolve, 2000));
+    console.log(data)
+    try {
+      const { data: res } = await axios.post(
+        `${API_BASE_URL}/loans/apply`,
+        data
+      );
+      if (!res.success) {
+        throw new Error("Error occured");
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const stepLabels = ["Customer", "Loan Details", "Collateral"];

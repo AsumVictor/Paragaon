@@ -3,6 +3,19 @@ import React, { useEffect, useState } from "react";
 import FormInput from "./FormInput";
 import { motion } from "framer-motion";
 import Button from "./Button";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/config";
+
+interface loanTypes {
+  id: string;
+  loanTypeName: string;
+  description: string;
+  loanLifeSpan: string;
+  minimumAmount: number;
+  maxAmount: number;
+  interest: string;
+}
+[];
 
 const LoadForm: React.FC<any> = ({
   formData,
@@ -10,44 +23,8 @@ const LoadForm: React.FC<any> = ({
   prevStep,
   nextStep,
 }) => {
-  const loanTypes = [
-    {
-      id: "1",
-      loanTypeName: "Personal Loan",
-      description: "Flexible personal loan for everyday needs.",
-      loanLifeSpan: "12 months",
-      minimumAmount: 1000,
-      maxAmount: 10000,
-      interest: "10%",
-    },
-    {
-      id: "2",
-      loanTypeName: "Business Loan",
-      description: "Boost your business with a dedicated loan.",
-      loanLifeSpan: "24 months",
-      minimumAmount: 5000,
-      maxAmount: 50000,
-      interest: "8%",
-    },
-    {
-      id: "3",
-      loanTypeName: "Education Loan",
-      description: "Finance your education with ease.",
-      loanLifeSpan: "36 months",
-      minimumAmount: 2000,
-      maxAmount: 20000,
-      interest: "5%",
-    },
-    {
-      id: "4",
-      loanTypeName: "Emergency Loan",
-      description: "Quick funds for urgent needs.",
-      loanLifeSpan: "6 months",
-      minimumAmount: 500,
-      maxAmount: 5000,
-      interest: "12%",
-    },
-  ];
+  const [loans, setLoans] = useState<loanTypes[]>([]);
+  const [isLoading, setLoading] = useState(false);
 
   const handleLoanType = (id: string) => {
     updateFormData({ loanTypeID: id });
@@ -58,21 +35,56 @@ const LoadForm: React.FC<any> = ({
     updateFormData({ loanAmount: value });
   };
 
+  useEffect(()=>{
+    const getLoanTypes = async()=>{
+      setLoading(true);
+
+      try {
+        const { data } = await axios.get(
+          `${API_BASE_URL}/loans/types`
+        );
+        const {
+          success,
+          data: loans,
+        }: {
+          success: boolean;
+          data: loanTypes[];
+        } = data;
+
+        if (!success) {
+          throw new Error("Unable to fetch customers");
+        }
+
+        setLoading(false);
+        setLoans(loans);
+        
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    }
+    getLoanTypes()
+  }, [])
+
+
   return (
     <div>
       <div className="   mt-10">
         <p className="font-medium text-2xl">Choose Loan Type</p>
-        <div className=" mt-5 grid grid-cols-3 gap-4 justify-center">
-          {loanTypes.map((loan, index) => (
-            <LoanCard
-              formData={formData}
-              key={index}
-              loan={loan}
-              index={index}
-              onClick={handleLoanType}
-            />
-          ))}
-        </div>
+
+        {!isLoading && loans.length > 0 && (
+          <div className=" mt-5 grid grid-cols-3 gap-4 justify-center">
+            {loans.map((loan, index) => (
+              <LoanCard
+                formData={formData}
+                key={index}
+                loan={loan}
+                index={index}
+                onClick={handleLoanType}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className=" mt-10">
@@ -171,7 +183,7 @@ const LoanCard = ({ formData, loan, index, onClick }) => {
       <p className="text-sm mb-2">{loan.description}</p>
       <ul className="text-sm mb-4 space-y-1">
         <li>
-          <span className="font-medium">Lifespan:</span> {loan.loanLifeSpan}
+          <span className="font-medium">Lifespan:</span> {loan.loanLifeSpan} Months
         </li>
         <li>
           <span className="font-medium">Min Amount:</span> GHC{" "}

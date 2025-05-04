@@ -12,11 +12,11 @@ def create_transaction(data):
     accountID = data["accountID"]
     amount = data["amount"]
     employeeID = data["employeeID"]
-    penalty_paid = data["penaltyPaid"]
-    loan_id = data["loanID"]
+
 
     # Deposit
     if transactionType == "DEPOSIT":  # Deposit
+        print("Employee",employeeID)
         query = perform_deposit(employeeID, accountID, amount)
         try:
             result = BASEQUERY(query)
@@ -28,9 +28,10 @@ def create_transaction(data):
     # Withdrawals
     elif transactionType == "WITHDRAW":
         check_query = is_balance_sufficient_for_withdrawal(accountID, amount)
-        balance_check = BASEQUERY(check_query)[0][0]
+        balance_check = BASEQUERY(check_query)
+        print("BALANCE",balance_check[0][0])
 
-        if balance_check != "SUFFICIENT":
+        if balance_check[0][0] != "SUFFICIENT":
             return jsonify({"success": False, "message": "Insufficient balance or Account maybe Inactive", "data": None}), 400
 
         query = perform_withdrawal(employeeID, accountID, amount)
@@ -42,6 +43,9 @@ def create_transaction(data):
             return jsonify({"success": False, "message": "Withdrawal failed", "data": None}), 400
 
     elif transactionType == "LOANREPAY":  # Loan
+            #
+        penalty_paid = data["penaltyPaid"]
+        loan_id = data["loanID"]
         query = transaction_loan_repayment_query(amount, accountID, employeeID,
                                                  penalty_paid, loan_id)
         try:
@@ -52,6 +56,7 @@ def create_transaction(data):
             return jsonify({"success": False, "message": "Loan payment failed", "data": None}), 400
 
     elif transactionType == "DISBURSE":  # Loan
+        loan_id = data["loanID"]
         query = disbursed_transaction(amount, accountID, employeeID, amount)
         try:
             result = BASEQUERY(query)

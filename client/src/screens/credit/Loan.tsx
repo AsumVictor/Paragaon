@@ -1,4 +1,6 @@
-import React from "react";
+import { API_BASE_URL } from "@/config/config";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type LoanStatus = "approved" | "pending" | "rejected";
@@ -45,8 +47,12 @@ const statusColors: Record<LoanStatus, string> = {
   rejected: "bg-red-200 text-red-800",
 };
 
-export const LoanCard: React.FC<{ loan: Loan, url: string }> = ({ loan, url }) => {
+export const LoanCard: React.FC<{ loan: Loan; url: string }> = ({
+  loan,
+  url,
+}) => {
   const navigate = useNavigate();
+ 
   return (
     <div
       className=" cursor-pointer border border-emerald-600 rounded-2xl shadow-lg p-6 w-full max-w-md"
@@ -83,7 +89,43 @@ export const LoanCard: React.FC<{ loan: Loan, url: string }> = ({ loan, url }) =
   );
 };
 
-const LoansPage: React.FC = () => (
+const LoansPage: React.FC = () => {
+  const [loans, setLoans] = useState([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`${API_BASE_URL}/transaction`);
+        const { data: loans, success } = data;
+        // if (!success) {
+        //   throw new Error("Unable to fetch loans");
+        // }
+
+        console.log(loans)
+        setLoans(loans);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    };
+
+    fetchCustomer();
+
+    
+  }, []);
+
+  // "accountHolder": "Dampare Odare",
+  // "account_id": "144a54fc_e391_4314_ac81_aada4dba4274",
+  // "id": "0fc944c3_ee15_4e5e_b15a_48592ba9c4da",
+  // "processedBy": "John Doe",
+  // "transactionAmount": 800.0,
+  // "transactionDate": "Sun, 04 May 2025 00:00:00 GMT",
+  // "type": "Deposit"
+
+  return (
   <div className=" flex flex-col items-center p-8">
     <h1 className="text-3xl font-bold text-emerald-900 mb-8">Loan Overview</h1>
     <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
@@ -92,6 +134,6 @@ const LoansPage: React.FC = () => (
       ))}
     </div>
   </div>
-);
+)};
 
 export default LoansPage;

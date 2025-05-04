@@ -12,7 +12,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction,
   index,
 }) => {
-  const isPositive = transaction.transactionAmount >= 0;
+  const isPositive = transaction.type == "Deposit";
 
   return (
     <motion.div
@@ -42,7 +42,8 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
             </span>
           </div>
           <div className="mt-2 text-sm text-gray-500">
-            ID: {transaction.transactionID} • {transaction.transactionDate}
+            ID: {transaction.transactionID.slice(0.5)} •{" "}
+            {transaction.transactionDate}
           </div>
           <div className="mt-1 text-xs text-gray-400">
             Processed by: {transaction.processedBy}
@@ -57,7 +58,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
               isPositive ? "text-emerald-600" : "text-red-600"
             }`}
           >
-            GHC {Number(transaction.transactionAmount).toFixed(2)}
+            GHC{" "}
+            {isPositive
+              ? `${Number(transaction.transactionAmount).toFixed(2)}`
+              : `-${Number(transaction.transactionAmount).toFixed(2)}`}
           </span>
         </motion.div>
       </div>
