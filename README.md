@@ -1,7 +1,5 @@
 # Paragon Micro-Finance Project
-
 Welcome to the Paragon Micro-Finance project! This documentation will guide you through understanding, setting up.
----
 
 ## Project Overview
 
@@ -40,6 +38,7 @@ Follow these steps to set up the project locally:
 ### Prerequisites
 - **Node.js** and **npm** (for the client).
 - **Python 3.9+** and **pip** (for the server).
+- In the ```.env.example``` file has the environment variables and have to replace them.
 
 ### Get Started
 #### Run Frontend
