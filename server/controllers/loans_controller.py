@@ -163,7 +163,16 @@ def getDefaulters():
 def allLoan():
     try:
         result = BASEQUERY(allLoans())
-        return jsonify({"success": True, "message": "Loan application submitted", "data": result}), 200
+        data = [{
+            "id": row[0],
+            "loanTypeName": row[1],
+            "dateApplied": row[2],
+            "customerName": row[3],
+            "issuerName": row[4],
+            "status": row[5]
+        } for row in result]
+        
+        return jsonify({"success": True, "message": "Loan application submitted", "data": data}), 200
     except:
         return jsonify({"success": False, "message": "Failed to submit loan application", "data": None}), 500
 
@@ -192,5 +201,23 @@ def allLoanTypes():
         } for row in result]
 
         return jsonify({"success": True, "data": data}), 200
+    except:
+        return jsonify({"success": False, "message": "Error occured", "data": None}), 400
+
+def getALLLoans():
+
+    try:
+        result = BASEQUERY(allLoans())
+        # data = [{
+        #     "id": row[0],
+        #     "loanTypeName": row[1],
+        #     "description": row[2],
+        #     "loanLifeSpan": row[3],
+        #     "minimumAmount": row[4],
+        #     "maxAmount": row[5],
+        #     "interest": row[6],
+        # } for row in result]
+
+        return jsonify({"success": True, "data": result}), 200
     except:
         return jsonify({"success": False, "message": "Error occured", "data": None}), 400

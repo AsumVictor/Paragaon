@@ -51,7 +51,7 @@ const App = () => (
                 }
               />
 
-<Route
+              <Route
                 path="/loans-request"
                 element={
                   <RequireRoleAccess allowedUsers={["Credit_manager"]}>
@@ -59,8 +59,6 @@ const App = () => (
                   </RequireRoleAccess>
                 }
               />
-
-
             </Route>
             <Route path="*" element={<NotFound />} />
 

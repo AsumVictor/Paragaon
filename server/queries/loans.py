@@ -213,8 +213,7 @@ def allLoans():
     l.applicationDate AS dateApplied,
     CONCAT(c.firstName, ' ', c.lastName) AS customerFullName,
     CONCAT(e.firstName, ' ', e.lastName) AS issuedByEmployeeFullName,
-    l.loanStatus,
-    l.applicationDate
+    l.loanStatus
     FROM 
         Loan l
     INNER JOIN 

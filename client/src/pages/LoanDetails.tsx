@@ -85,15 +85,14 @@ export default function LoanDetailsPage() {
             <CardContent className="flex flex-col items-center">
               <Avatar className="w-16 h-16 mb-2 border border-emerald-200">
                 <AvatarFallback className="bg-emerald-200 text-emerald-600">
-                  CU
+                  IB
                 </AvatarFallback>
               </Avatar>
               <div className="text-center">
-                <p className="font-semibold text-emerald-600">John Doe</p>
-                <p className="text-sm text-gray-500">Customer ID: C12345</p>
-                <p className="text-sm text-gray-500">Phone Number: C12345</p>
+                <p className="font-semibold text-emerald-600">Issac Bolt</p>
+                <p className="text-sm text-gray-500">Phone Number: 0541111111</p>
                 <div className=" mt-3 bg-yellow-100 text-yellow-900 font-extrabold py-1 px-3 rounded-lg">
-                  Zone B
+                  Ashesi Zone
                 </div>
               </div>
             </CardContent>
@@ -106,11 +105,10 @@ export default function LoanDetailsPage() {
             </CardHeader>
             <CardContent>
               <p className="font-semibold text-emerald-700">
-                Car - Toyota Corolla 2019
+                Toyota Corolla 2019 Tire
               </p>
-              <p className="text-sm text-gray-500">Collateral ID: CL9876</p>
               <p className="text-sm text-gray-500 mt-2">
-                Estimated Value: $15,000
+                Estimated Value: GHC 5000
               </p>
             </CardContent>
           </Card>
@@ -126,10 +124,6 @@ export default function LoanDetailsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-semibold text-emerald-700">Loan ID</p>
-                  <p className="text-gray-800">L00123</p>
-                </div>
                 <div className="">
                   <p className="font-semibold text-emerald-700">Loan Type</p>
                   <div className=" flex flex-wrap gap-2">
@@ -137,7 +131,7 @@ export default function LoanDetailsPage() {
                       variant="outline"
                       className="bg-yellow-50 text-yellow-800 border border-yellow-200 uppercase"
                     >
-                      Personal Loan
+                      Ɛdan Sika Loan
                     </Badge>
                     <Badge
                       variant="outline"
@@ -155,21 +149,21 @@ export default function LoanDetailsPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-emerald-700">Loan Amount</p>
-                  <p className="text-gray-800">$10,000</p>
+                  <p className="text-gray-800">GHC 7,000</p>
                 </div>
 
                 <div>
                   <p className="font-semibold text-emerald-700">
                     Outstanding Amount
                   </p>
-                  <p className="text-gray-800">$4,000</p>
+                  <p className="text-gray-800">N/A</p>
                 </div>
 
                 <div>
                   <p className="font-semibold text-emerald-700">
                     Amount Settled
                   </p>
-                  <p className="text-gray-800">$6,000</p>
+                  <p className="text-gray-800">N/A</p>
                 </div>
 
                 <div>
@@ -178,7 +172,7 @@ export default function LoanDetailsPage() {
                     variant="outline"
                     className="bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase"
                   >
-                    Disbursed
+                    Pending
                   </Badge>
                 </div>
 
@@ -186,19 +180,19 @@ export default function LoanDetailsPage() {
                   <p className="font-semibold text-emerald-700">
                     Application Date
                   </p>
-                  <p className="text-gray-800">2025-04-01</p>
+                  <p className="text-gray-800">2025/04/05</p>
                 </div>
 
                 <div>
                   <p className="font-semibold text-emerald-700">
                     Approval Date
                   </p>
-                  <p className="text-gray-800">2025-04-05</p>
+                  <p className="text-gray-800">N/A</p>
                 </div>
 
                 <div>
                   <p className="font-semibold text-emerald-700">Due Date</p>
-                  <p className="text-gray-800">2025-10-01</p>
+                  <p className="text-gray-800">N/A</p>
                 </div>
               </div>
             </CardContent>
@@ -213,12 +207,11 @@ export default function LoanDetailsPage() {
               <CardContent className="flex items-center space-x-3">
                 <Avatar className="w-12 h-12 border border-emerald-200">
                   <AvatarFallback className="bg-emerald-200 text-emerald-600">
-                    IB
+                    JD
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold text-emerald-700">Jane Smith</p>
-                  <p className="text-sm text-gray-500">Employee ID: E5678</p>
+                  <p className="font-semibold text-emerald-700">Jone Doe</p>
                 </div>
               </CardContent>
             </Card>
@@ -229,14 +222,13 @@ export default function LoanDetailsPage() {
               <CardContent className="flex items-center space-x-3">
                 <Avatar className="w-12 h-12 border border-emerald-200">
                   <AvatarFallback className="bg-emerald-200 text-emerald-600">
-                    AB
+                    -
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-semibold text-emerald-700">
-                    Michael Johnson
+                    N/A
                   </p>
-                  <p className="text-sm text-gray-500">Employee ID: E3456</p>
                 </div>
               </CardContent>
             </Card>
