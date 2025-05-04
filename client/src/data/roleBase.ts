@@ -23,9 +23,10 @@ const roleBasedRoutes = {
 
   collector: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/" },
-    { label: "Customers", icon: Users, href: "/customers" }, // create + view customers
-    { label: "Transactions", icon: Banknote, href: "/transactions" }, // make + view collector's transactions
-    { label: "Loans", icon: FileText, href: "/loans" }, // view and filter loans
+    { label: "Customers", icon: Users, href: "/customers" },
+    { label: "Transactions", icon: Banknote, href: "/transactions" },
+    { label: "Loans", icon: FileText, href: "/loans" },
+    { label: "Repay Loan", icon: FileText, href: "/repay-loan" },
   ],
 
   credit_manager: [

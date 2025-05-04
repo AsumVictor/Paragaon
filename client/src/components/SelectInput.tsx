@@ -72,7 +72,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[10rem] overflow-y-auto overflow-x-hidden"
+              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg h-[5rem] overflow-y-auto overflow-x-hidden"
             >
               {options.map((option, index) => (
                 <motion.button

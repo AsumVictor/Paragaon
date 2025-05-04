@@ -1,7 +1,13 @@
-import React, { useState } from "react";
-import { X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Loader, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Input from "./Input";
+import { Option } from "@/types/inputs";
+import { Customer } from "@/types/auth";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/config";
+import { useAuth } from "@/contexts/AuthContext";
+import CustomSelect from "./SelectInput";
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -10,62 +16,31 @@ interface AddTransactionModalProps {
     type: string;
     transactionDate: string;
     transactionAmount: number;
-    accountHolder: string;
+    accountID: string;
     processedBy: string;
   }) => void;
 }
 
-const transactionTypes = [
-  "To Fund Account",
-  "To Withdrawal",
-  "To Re-Pay Loan",
-  "To Disburse Loan",
-];
+const transactionTypes = ["DEPOSIT", "WITHDRAW"];
 
 const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   isOpen,
   onClose,
   onAddTransaction,
 }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     type: "",
-    transactionDate: new Date().toISOString().split("T")[0],
-    transactionAmount: "",
-    accountHolder: "",
-    processedBy: "",
+    amount: "",
+    accountID: "",
+    employeeID: user.employeeID,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.type) {
-      newErrors.type = "Transaction type is required";
-    }
-
-    if (!formData.transactionDate) {
-      newErrors.transactionDate = "Transaction date is required";
-    }
-
-    if (!formData.transactionAmount) {
-      newErrors.transactionAmount = "Transaction amount is required";
-    } else if (isNaN(Number(formData.transactionAmount))) {
-      newErrors.transactionAmount = "Amount must be a valid number";
-    }
-
-    if (!formData.accountHolder) {
-      newErrors.accountHolder = "Account holder is required";
-    }
-
-    if (!formData.processedBy) {
-      newErrors.processedBy = "Processor information is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const [isLoading, setLoading] = useState(false);
+  const [options, setOptions] = useState<Option[]>([]);
+  const [customerList, setCustomers] = useState<Customer[]>([]);
+  const [currCustomer, setCurrCutomer] = useState<Customer>();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -81,29 +56,84 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
+    setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+   console.log(formData)
+      const { data } = await axios.post(
+        `${API_BASE_URL}/transaction/create`,
+        formData
+      );
+      const {
+        success,
+        data: res,
+      }: {
+        success: boolean;
+        data: Customer[];
+      } = data;
 
-      // Reset form
+      if (!success) {
+        throw new Error("Unable to fetch customers");
+      }
+
+
       setFormData({
         type: "",
-        transactionDate: new Date().toISOString().split("T")[0],
-        transactionAmount: "",
-        accountHolder: "",
-        processedBy: "",
+        amount: "",
+        accountID: "",
+        employeeID: user.employeeID,
       });
+      
 
       onClose();
-    } finally {
-      setIsSubmitting(false);
+    } catch (err){
+console.log(err)
+    }
+    finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          `${API_BASE_URL}/customer/collector/${user.zoneId}`
+        );
+        const {
+          success,
+          data: customers,
+        }: {
+          success: boolean;
+          data: Customer[];
+        } = data;
+
+        if (!success) {
+          throw new Error("Unable to fetch customers");
+        }
+
+        setLoading(false);
+        setCustomers(customers);
+        const customerOptions: Option[] = customers.map((c) => {
+          return {
+            value: c.id,
+            label: `${c.name} (${c.phone})`,
+          };
+        });
+        setOptions(customerOptions);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    };
+
+    fetchCustomer();
+  }, []);
+
+  const handleCustomerID = (id: string) => {
+    setFormData((prev) => ({ ...prev, accountID: id }));
+  };
   return (
     <AnimatePresence>
       {isOpen && (
@@ -152,9 +182,9 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                       onClick={() => setFormData((prev) => ({ ...prev, type }))}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         formData.type === type
-                          ? type === "Deposit"
+                          ? type === "Deposit".toUpperCase()
                             ? "bg-emerald-100 text-emerald-800"
-                            : type === "Withdrawal"
+                            : type === "Withdraw".toUpperCase()
                             ? "bg-red-100 text-red-800"
                             : type === "Transfer"
                             ? "bg-blue-100 text-blue-800"
@@ -186,13 +216,13 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
                   type="text"
-                  id="transactionAmount"
-                  name="transactionAmount"
-                  value={formData.transactionAmount}
+                  id="amount"
+                  name="amount"
+                  value={formData.amount}
                   onChange={handleChange}
                   placeholder="0.00"
                   className={`w-full p-2 border ${
-                    errors.transactionAmount
+                    errors.amount
                       ? "border-red-500"
                       : "border-gray-300"
                   } rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition-shadow`}
@@ -205,29 +235,29 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               </div>
 
               {/* Account Holder */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="accountHolder"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Account Holder
-                </label>
-                <motion.input
-                  whileFocus={{ scale: 1.02 }}
-                  type="text"
-                  id="accountHolder"
-                  name="accountHolder"
-                  value={formData.accountHolder}
-                  onChange={handleChange}
-                  placeholder="Account holder name"
-                  className={`w-full p-2 border ${
-                    errors.accountHolder ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition-shadow`}
-                />
-                {errors.accountHolder && (
-                  <p className="text-sm text-red-500">{errors.accountHolder}</p>
-                )}
-              </div>
+              {isLoading && customerList.length == 0 && (
+                <div className="mt-14 flex items-center space-x-3 p-4 rounded-xl">
+                  <Loader className="w-6 h-6 text-emerald-600 animate-spin" />
+                  <p className="text-emerald-800">
+                    Checking eligibility status…
+                  </p>
+                </div>
+              )}
+
+              {customerList.length > 0 && (
+                <div className="mt-14">
+                  <CustomSelect
+                    label={"Select the Customer applying for this Loan"}
+                    options={options}
+                    value={formData.accountID}
+                    onChange={handleCustomerID}
+                    //   error={"You have to pick a applicant"}
+                    required
+                  />
+                </div>
+              )}
+
+              {/* other */}
 
               <div className="flex justify-end space-x-3 pt-4">
                 <motion.button
@@ -236,7 +266,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                   type="button"
                   onClick={onClose}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                 >
                   Cancel
                 </motion.button>
@@ -244,10 +274,10 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="relative px-4 py-2 bg-emerald-800 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {isLoading ? (
                     <>
                       <span className="opacity-0">Add Transaction</span>
                       <div className="absolute inset-0 flex items-center justify-center">

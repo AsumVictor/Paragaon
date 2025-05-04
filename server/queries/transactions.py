@@ -49,45 +49,57 @@ def get_transactions_by_collector(collector_employee_id):
 # Query that validates a balance before a withdrawal
 
 
-def is_balance_sufficient_for_withdrawal(account_ID, amount):
+def is_balance_sufficient_for_withdrawal(customer_id, amount):
     res = f"""
         SELECT 
-            CASE 
-                WHEN sa.availableBalance >= {amount} THEN 'SUFFICIENT'
-                ELSE 'INSUFFICIENT'
-            END AS balanceStatus
+        CASE 
+            WHEN sa.availableBalance >= {amount} THEN 'SUFFICIENT'
+            ELSE 'INSUFFICIENT'
+        END AS balanceStatus
         FROM SavingsAccount sa
-        WHERE sa.savingsAccountID = '{account_ID}' AND sa.accountStatus = 'ACTIVE';
-
+        WHERE sa.customerID = '{customer_id}' 
+            AND sa.accountStatus = 'ACTIVE'
+        LIMIT 1;
     """
     return res
 
 # A Query that performs deposit transaction by a collector
 
 
-def perform_deposit(collector_employee_id, account_id, amount):
+def perform_deposit(collector_employee_id, customer_id, amount):
     transaction_id = str(uuid.uuid4()).replace("-", '_')
     date = get_current_date()
 
     res = f"""
-        START TRANSACTION;
         
-            INSERT INTO Transaction (
-                transactionID,
-                transactionTypeID,
-                transactionDate,
-                transactionAmount,
-                savingsAccountID,
-                processedBy
-                ) VALUES ('{transaction_id}', 'TT001', "{date}", {amount}, '{account_id}', '{collector_employee_id}');
-    
-    
-                UPDATE SavingsAccount
-                SET currentBalance = currentBalance + {amount},
-                    availableBalance = availableBalance + {amount}
-                WHERE savingsAccountID = '{account_id}';
+        START TRANSACTION;
 
-        COMMIT;
+-- Find savings account ID for the customer
+SET @account_id = (
+    SELECT savingsAccountID
+    FROM SavingsAccount
+    WHERE customerID = '{customer_id}'
+    LIMIT 1
+);
+
+-- Insert the transaction
+INSERT INTO Transaction (
+    transactionID,
+    transactionTypeID,
+    transactionDate,
+    transactionAmount,
+    savingsAccountID,
+    processedBy
+) VALUES ('{transaction_id}', 'TT001', "{date}", {amount}, @account_id, '{collector_employee_id}');
+
+-- Update the savings account balances
+UPDATE SavingsAccount
+SET currentBalance = currentBalance + {amount},
+    availableBalance = availableBalance + {amount}
+WHERE savingsAccountID = @account_id;
+
+COMMIT;
+
 
     """
     return res
@@ -95,27 +107,34 @@ def perform_deposit(collector_employee_id, account_id, amount):
 # Query for withdrawal transaction by a collector
 
 
-def perform_withdrawal(collector_employee_id, account_id, amount):
+def perform_withdrawal(collector_employee_id, customer_id, amount):
     transaction_id = str(uuid.uuid4()).replace("-", '_')
     date = get_current_date()
 
     res = f"""
         START TRANSACTION;
 
-        INSERT INTO Transaction (
-            transactionID,
-            transactionTypeID,
-            transactionDate,
-            transactionAmount,
-            savingsAccountID,
-            processedBy
-    ) VALUES ('{transaction_id}', 'TT002', "{date}", {amount}, '{account_id}', '{collector_employee_id}');
-    
-    
+
+    SET @account_id = (
+        SELECT savingsAccountID
+        FROM SavingsAccount
+        WHERE customerID = '{customer_id}'
+        LIMIT 1
+    );
+
+    INSERT INTO Transaction (
+        transactionID,
+        transactionTypeID,
+        transactionDate,
+        transactionAmount,
+        savingsAccountID,
+        processedBy
+    ) VALUES ('{transaction_id}', 'TT002', "{date}", {amount}, @account_id, '{collector_employee_id}');
+
     UPDATE SavingsAccount
     SET currentBalance = currentBalance - {amount},
         availableBalance = availableBalance - {amount}
-    WHERE savingsAccountID = '{account_id}';
+    WHERE savingsAccountID = @account_id;
 
     COMMIT;
 
